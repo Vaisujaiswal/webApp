@@ -14,7 +14,7 @@ function Sidebar({ onLogout }) {
   return (
     <div className="sidebar">
       <div>
-        <h2>⚡ SmartEnergy</h2>
+        <h2>⚡SmartEnergy</h2>
 
         <NavLink to="/" end className="menu">
           <FaChartPie /> Dashboard
