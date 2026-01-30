@@ -63,3 +63,111 @@
   margin-bottom: 10px;
 }
 
+/* Page background */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #020617, #020617);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card */
+.auth-card {
+  width: 380px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.18);
+  animation: fadeIn 0.35s ease-in-out;
+}
+
+/* Titles */
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 6px;
+  color: #38bdf8;
+}
+
+.auth-card h4 {
+  text-align: center;
+  margin-bottom: 18px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Inputs & Select */
+.auth-card input,
+.auth-card select {
+  width: 100%;
+  padding: 11px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-card input::placeholder {
+  color: #64748b;
+}
+
+.auth-card input:focus,
+.auth-card select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+}
+
+/* Buttons */
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #020617;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin-bottom: 10px;
+}
+
+.auth-card button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.35);
+}
+
+/* Step navigation */
+.step-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.step-actions button {
+  flex: 1;
+}
+
+/* Error */
+.error {
+  color: #f87171;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
