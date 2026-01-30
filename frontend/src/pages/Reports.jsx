@@ -10,30 +10,56 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
 } from "recharts";
 import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
 
+const API_BASE = "http://localhost:5000/api";
+
 function Reports() {
   const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const token = localStorage.getItem("token");
+
+  /* =========================
+     LOAD DEVICES (BACKEND)
+  ========================= */
   useEffect(() => {
-    const loadDevices = () => {
-      const data = JSON.parse(localStorage.getItem("devices")) || [];
-      setDevices(data);
+    const fetchDevices = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/devices`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch devices");
+        }
+
+        const data = await res.json();
+        setDevices(data);
+      } catch (err) {
+        console.error("REPORTS DEVICE FETCH ERROR:", err);
+        setDevices([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    loadDevices();
-    window.addEventListener("storage", loadDevices);
+    if (token) {
+      fetchDevices();
+    }
+  }, [token]);
 
-    return () => window.removeEventListener("storage", loadDevices);
-  }, []);
-
-  // DAILY USAGE PER DEVICE (kWh)
+  /* =========================
+     DAILY USAGE PER DEVICE (kWh)
+  ========================= */
   const deviceUsage = devices.map((d) => ({
     name: d.name,
-    usage: (d.power * d.hours) / 1000
+    usage: (d.power * d.hoursPerDay) / 1000,
   }));
 
   const totalDailyUnits = deviceUsage.reduce(
@@ -41,24 +67,33 @@ function Reports() {
     0
   );
 
-  // MONTHLY TREND (derived)
+  /* =========================
+     MONTHLY TREND (DERIVED)
+  ========================= */
   const monthlyTrend = Array.from({ length: 6 }, (_, i) => ({
     month: new Date(0, i).toLocaleString("default", { month: "short" }),
-    units: +(totalDailyUnits * (24 + i)).toFixed(1)
+    units: +(totalDailyUnits * (24 + i)).toFixed(1),
   }));
 
-
-  // COST BREAKDOWN
+  /* =========================
+     COST BREAKDOWN
+  ========================= */
   const TARIFF = 7;
+
   const costData = deviceUsage
-    .filter(d => d.usage > 0)
-    .map(d => ({
+    .filter((d) => d.usage > 0)
+    .map((d) => ({
       name: d.name,
-      value: +(d.usage * TARIFF * 30).toFixed(2)
+      value: +(d.usage * TARIFF * 30).toFixed(2),
     }));
 
-
-  const COLORS = ["#38bdf8", "#22c55e", "#facc15", "#f87171", "#a78bfa"];
+  const COLORS = [
+    "#38bdf8",
+    "#22c55e",
+    "#facc15",
+    "#f87171",
+    "#a78bfa",
+  ];
 
   return (
     <div style={{ padding: "25px" }}>
@@ -94,9 +129,12 @@ function Reports() {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="usage" fill="#38bdf8" animationDuration={1200} />
+              <Bar
+                dataKey="usage"
+                fill="#38bdf8"
+                animationDuration={1200}
+              />
             </BarChart>
-
           </ResponsiveContainer>
         </div>
 
@@ -116,7 +154,6 @@ function Reports() {
                 strokeWidth={3}
                 animationDuration={1500}
               />
-
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -126,8 +163,10 @@ function Reports() {
       <div className="chart-card" style={{ marginTop: "25px" }}>
         <h3>Cost Breakdown by Device (Monthly)</h3>
 
-        {devices.length === 0 ? (
-          <p style={{ opacity: 0.7 }}>Add devices to see reports.</p>
+        {loading || devices.length === 0 ? (
+          <p style={{ opacity: 0.7 }}>
+            Add devices to see reports.
+          </p>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -140,7 +179,6 @@ function Reports() {
                 animationBegin={200}
                 animationDuration={1400}
               >
-
                 {costData.map((_, index) => (
                   <Cell
                     key={index}
@@ -153,8 +191,6 @@ function Reports() {
             </PieChart>
           </ResponsiveContainer>
         )}
-
-
       </div>
     </div>
   );

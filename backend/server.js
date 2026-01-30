@@ -7,7 +7,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import energyRoutes from "./routes/energyRoutes.js";
-import { verifyToken } from "./middleware/authMiddleware.js";
+import deviceRoutes from "./routes/deviceRoutes.js";
 
 const app = express();
 
@@ -18,7 +18,6 @@ app.use(
   cors({
     origin: "http://localhost:3000",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
@@ -32,10 +31,22 @@ connectDB();
 /* =========================
    ROUTES
 ========================= */
+
+// 🔓 AUTH (public)
 app.use("/api/auth", authRoutes);
 
-// 🔐 PROTECTED ROUTES
-app.use("/api/energy", verifyToken, energyRoutes);
+// 🔐 ENERGY (protected internally)
+app.use("/api/energy", energyRoutes);
+
+// 🔐 DEVICES (protected internally)
+app.use("/api/devices", deviceRoutes);
+
+/* =========================
+   HEALTH CHECK (IMPORTANT)
+========================= */
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK", uptime: process.uptime() });
+});
 
 /* =========================
    404 HANDLER

@@ -9,69 +9,108 @@ import {
   FaRupeeSign,
   FaBolt,
   FaBullseye,
-  FaLeaf,
 } from "react-icons/fa";
 
 import { generateRecommendations } from "../utils/recommendationEngine";
 
 function DashboardHome() {
+  const [summary, setSummary] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [animateStats, setAnimateStats] = useState(false);
-
-  // TEMP (later from backend)
-  const usageData = {
-    nightUsageHigh: true,
-    acUsageHigh: true,
-    idleDevicesDetected: false,
-  };
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      setAnimateStats(true);
-    }, 300);
+    let isMounted = true;
 
-    setRecommendations(generateRecommendations(usageData));
-    return () => clearTimeout(timer);
+    const fetchDashboardSummary = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          throw new Error("Authentication token missing");
+        }
+
+        const res = await fetch(
+          "http://localhost:5000/api/energy/summary",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to load dashboard data");
+        }
+
+        const data = await res.json();
+
+        if (!isMounted) return;
+
+        setSummary(data);
+
+        // Generate recommendations using backend signals
+        const recs = generateRecommendations(data.usageSignals || {});
+        setRecommendations(recs);
+
+        setAnimateStats(true);
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+        if (isMounted) {
+          setError("Unable to load dashboard data");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchDashboardSummary();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  if (error) {
+    return (
+      <div className="dashboard-container">
+        <p className="error">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-container">
-      {/* HEADER */}
-      <div className="dashboard-header">
-        {/* <div className="header-content">
-          <h1 className="dashboard-title">
-            <span className="title-icon">⚡</span>
-            Energy Overview
-          </h1>
-          <div className="header-badge">
-            <FaLeaf className="leaf-icon" />
-            <span>Eco Mode Active</span>
-          </div>
-        </div> */}
-      </div>
-
-      {/* STATS */}
+      {/* =====================
+          STATS
+      ===================== */}
       <div className={`stats ${animateStats ? "stats-animate" : ""}`}>
         <StatCard
           title="Total Cost"
-          value="₹1450"
+          value={summary ? `₹${summary.totalCost}` : "—"}
           icon={<FaRupeeSign />}
         />
         <StatCard
           title="Usage Today"
-          value="32.5 kWh"
+          value={summary ? `${summary.usageToday} kWh` : "—"}
           icon={<FaBolt />}
         />
         <StatCard
           title="Efficiency"
-          value="78%"
+          value={summary ? `${summary.efficiency}%` : "—"}
           icon={<FaBullseye />}
         />
       </div>
 
-      {/* MAIN GRID */}
+      {/* =====================
+          MAIN GRID
+      ===================== */}
       <div className="content">
         <div className="chart-section">
           <h3 className="section-title">Energy Usage Pattern</h3>
@@ -80,6 +119,9 @@ function DashboardHome() {
 
         <div className="recommendations">
           <h3 className="section-title">💡 Smart Suggestions</h3>
+          {recommendations.length === 0 && !isLoading && (
+            <p style={{ opacity: 0.7 }}>No suggestions available</p>
+          )}
           {recommendations.map((rec, i) => (
             <RecommendationCard
               key={i}
@@ -90,11 +132,16 @@ function DashboardHome() {
         </div>
       </div>
 
-      {/* FOOTER */}
+      {/* =====================
+          FOOTER
+      ===================== */}
       <div className="bottom">
         <EfficiencyMeter />
       </div>
 
+      {/* =====================
+          LOADING OVERLAY
+      ===================== */}
       {isLoading && (
         <div className="loading-overlay">
           <div className="loading-spinner"></div>

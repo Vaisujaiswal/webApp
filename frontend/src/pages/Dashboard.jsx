@@ -1,5 +1,4 @@
 
-<<<<<<< HEAD
 // import Sidebar from "../components/Sidebar";
 // import TopBar from "../components/TopBar";
 // import StatCard from "../components/StatCard";
@@ -134,9 +133,6 @@
 
 import { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-=======
-
->>>>>>> ce6e1cba008177629cfe32a329c52fc28d89a5b5
 import Sidebar from "../components/Sidebar";
 import TopBar from "../components/TopBar";
 import "../styles/dashboard.css";

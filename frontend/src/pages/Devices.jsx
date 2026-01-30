@@ -2,85 +2,171 @@ import { useState, useEffect } from "react";
 import "../styles/dashboard.css";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
+const API_BASE = "http://localhost:5000/api";
+
 function Devices() {
   const [devices, setDevices] = useState([]);
   const [name, setName] = useState("");
   const [power, setPower] = useState("");
   const [hours, setHours] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Load devices from localStorage
+  const token = localStorage.getItem("token");
+
+  /* =========================
+     LOAD DEVICES (BACKEND)
+  ========================= */
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("devices")) || [];
-    setDevices(saved);
-  }, []);
+    const fetchDevices = async () => {
+      try {
+        setError(null);
 
-  // Save devices to localStorage
-  useEffect(() => {
-    localStorage.setItem("devices", JSON.stringify(devices));
-  }, [devices]);
+        const res = await fetch(`${API_BASE}/devices`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const addDevice = () => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch devices");
+        }
+
+        const data = await res.json();
+        setDevices(data);
+      } catch (err) {
+        console.error("DEVICE FETCH ERROR:", err);
+        setError("Unable to load devices");
+      }
+    };
+
+    if (token) {
+      fetchDevices();
+    }
+  }, [token]);
+
+  /* =========================
+     ADD DEVICE
+  ========================= */
+  const addDevice = async () => {
     if (!name || !power || !hours) return;
 
-    setDevices([
-      ...devices,
-      {
-        id: Date.now(),
-        name,
-        power: Number(power),
-        hours: Number(hours)
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`${API_BASE}/devices`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          power: Number(power),
+          hours: Number(hours), // backend maps → hoursPerDay
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to add device");
       }
-    ]);
 
-    setName("");
-    setPower("");
-    setHours("");
+      const newDevice = await res.json();
+      setDevices((prev) => [newDevice, ...prev]);
+
+      setName("");
+      setPower("");
+      setHours("");
+    } catch (err) {
+      console.error("ADD DEVICE ERROR:", err);
+      setError("Unable to add device");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeDevice = (id) => {
-    setDevices(devices.filter((d) => d.id !== id));
+  /* =========================
+     REMOVE DEVICE
+  ========================= */
+  const removeDevice = async (id) => {
+    try {
+      setError(null);
+
+      const res = await fetch(`${API_BASE}/devices/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete device");
+      }
+
+      setDevices((prev) => prev.filter((d) => d._id !== id));
+    } catch (err) {
+      console.error("REMOVE DEVICE ERROR:", err);
+      setError("Unable to remove device");
+    }
   };
 
-  const totalPower = devices.reduce((sum, d) => sum + d.power, 0);
+  /* =========================
+     DERIVED METRICS (REAL)
+  ========================= */
+  const totalPower = devices.reduce(
+    (sum, d) => sum + (d.power || 0),
+    0
+  );
+
   const totalUnits =
-    devices.reduce((sum, d) => sum + d.power * d.hours, 0) / 1000;
+    devices.reduce(
+      (sum, d) =>
+        sum + (d.power || 0) * (d.hoursPerDay || 0),
+      0
+    ) / 1000;
 
   return (
     <div style={{ padding: "25px" }}>
       <h2>Device Management</h2>
       <p>Add and manage your electrical devices.</p>
 
+      {error && <p className="error">{error}</p>}
+
       {/* ADD DEVICE */}
-<div className="chart-card">
-  <h3>Add Device</h3>
+      <div className="chart-card">
+        <h3>Add Device</h3>
 
-  <div className="add-device-row">
-    <input
-      placeholder="Device Name (e.g. AC)"
-      value={name}
-      onChange={(e) => setName(e.target.value)}
-    />
+        <div className="add-device-row">
+          <input
+            placeholder="Device Name (e.g. AC)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-    <input
-      type="number"
-      placeholder="Power (Watts)"
-      value={power}
-      onChange={(e) => setPower(e.target.value)}
-    />
+          <input
+            type="number"
+            placeholder="Power (Watts)"
+            value={power}
+            onChange={(e) => setPower(e.target.value)}
+          />
 
-    <input
-      type="number"
-      placeholder="Usage Hours / Day"
-      value={hours}
-      onChange={(e) => setHours(e.target.value)}
-    />
+          <input
+            type="number"
+            placeholder="Usage Hours / Day"
+            value={hours}
+            onChange={(e) => setHours(e.target.value)}
+          />
 
-    <button onClick={addDevice} className="add-device-btn">
-      <FaPlus /> Add
-    </button>
-  </div>
-</div>
-
+          <button
+            onClick={addDevice}
+            className="add-device-btn"
+            disabled={loading}
+          >
+            <FaPlus /> {loading ? "Adding..." : "Add"}
+          </button>
+        </div>
+      </div>
 
       {/* DEVICE LIST */}
       <div className="chart-card" style={{ marginTop: "20px" }}>
@@ -94,20 +180,20 @@ function Devices() {
               <tr>
                 <th>Name</th>
                 <th>Power (W)</th>
-                <th>Hours</th>
+                <th>Hours / Day</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {devices.map((d) => (
-                <tr key={d.id}>
+                <tr key={d._id}>
                   <td>{d.name}</td>
                   <td>{d.power}</td>
-                  <td>{d.hours}</td>
+                  <td>{d.hoursPerDay}</td>
                   <td>
                     <FaTrash
                       style={{ cursor: "pointer", color: "#f87171" }}
-                      onClick={() => removeDevice(d.id)}
+                      onClick={() => removeDevice(d._id)}
                     />
                   </td>
                 </tr>
@@ -120,8 +206,14 @@ function Devices() {
       {/* SUMMARY */}
       <div className="chart-card" style={{ marginTop: "20px" }}>
         <h3>Summary</h3>
-        <p><strong>Total Connected Load:</strong> {totalPower} W</p>
-        <p><strong>Daily Energy Usage:</strong> {totalUnits.toFixed(2)} kWh</p>
+        <p>
+          <strong>Total Connected Load:</strong>{" "}
+          {totalPower} W
+        </p>
+        <p>
+          <strong>Estimated Daily Usage:</strong>{" "}
+          {totalUnits.toFixed(2)} kWh
+        </p>
       </div>
     </div>
   );
