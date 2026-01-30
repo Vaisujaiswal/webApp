@@ -8,6 +8,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import energyRoutes from "./routes/energyRoutes.js";
 import deviceRoutes from "./routes/deviceRoutes.js";
+import emissionRoutes from "./routes/emissionRoutes.js"; // ✅ ADDED
 
 const app = express();
 
@@ -41,11 +42,18 @@ app.use("/api/energy", energyRoutes);
 // 🔐 DEVICES (protected internally)
 app.use("/api/devices", deviceRoutes);
 
+// 🔐 EMISSIONS (protected internally)
+app.use("/api/emissions", emissionRoutes); // ✅ ADDED
+
 /* =========================
    HEALTH CHECK (IMPORTANT)
 ========================= */
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "OK", uptime: process.uptime() });
+  res.status(200).json({
+    status: "OK",
+    uptime: process.uptime(),
+    timestamp: new Date(),
+  });
 });
 
 /* =========================

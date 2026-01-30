@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import StatCard from "../components/StatCard";
 import EnergyChart from "../components/EnergyChart";
 import RecommendationCard from "../components/RecommendationCard";
-import EfficiencyMeter from "../components/EfficiencyMeter";
 import "../styles/dashboard.css";
 
 import {
@@ -130,13 +129,6 @@ function DashboardHome() {
             />
           ))}
         </div>
-      </div>
-
-      {/* =====================
-          FOOTER
-      ===================== */}
-      <div className="bottom">
-        <EfficiencyMeter />
       </div>
 
       {/* =====================
