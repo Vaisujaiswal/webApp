@@ -76,7 +76,7 @@ import EfficiencyMeter from "../components/EfficiencyMeter";
 import "../styles/dashboard.css";
 import { FaRupeeSign, FaBolt, FaBullseye } from "react-icons/fa";
 
-function Dashboard() {
+function Dashboard({ role }) {
   return (
     <div className="app">
       <Sidebar />
