@@ -1,21 +1,66 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import cors from "cors";
+
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+import energyRoutes from "./routes/energyRoutes.js";
+import { verifyToken } from "./middleware/authMiddleware.js";
 
 const app = express();
-app.use(cors());
+
+/* =========================
+   MIDDLEWARE
+========================= */
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
+
 app.use(express.json());
-app.use("/api/energy", require("./routes/energyRoutes"));
 
+/* =========================
+   DATABASE
+========================= */
+connectDB();
 
-mongoose
-  .connect("mongodb://127.0.0.1:27017/smartenergy")
-  .then(() => console.log("MongoDB Connected"));
+/* =========================
+   ROUTES
+========================= */
+app.use("/api/auth", authRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Smart Energy Backend Running");
+// 🔐 PROTECTED ROUTES
+app.use("/api/energy", verifyToken, energyRoutes);
+
+/* =========================
+   404 HANDLER
+========================= */
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Route not found",
+    path: req.originalUrl,
+  });
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+/* =========================
+   GLOBAL ERROR HANDLER
+========================= */
+app.use((err, req, res, next) => {
+  console.error("GLOBAL ERROR:", err);
+  res.status(err.status || 500).json({
+    message: err.message || "Internal server error",
+  });
+});
+
+/* =========================
+   SERVER
+========================= */
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });

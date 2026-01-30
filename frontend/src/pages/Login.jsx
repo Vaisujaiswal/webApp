@@ -1,123 +1,71 @@
-// import { useState } from "react";
-// import "../styles/auth.css";
-
-// function Login({ onLogin }) {
-//     const [email, setEmail] = useState("");
-//     const [password, setPassword] = useState("");
-//     const [error, setError] = useState("");
-
-//     const handleLogin = (e) => {
-//         e.preventDefault();
-
-//         const savedUser = JSON.parse(localStorage.getItem("user"));
-
-//         if (!savedUser) {
-//             setError("No user found. Please register first.");
-//             return;
-//         }
-
-//         if (email !== savedUser.email || password !== savedUser.password) {
-//             setError("Invalid email or password");
-//             return;
-//         }
-
-//         onLogin(savedUser.role);
-//     };
-
-//     return (
-//         <div className="auth-container">
-//             <form className="auth-card" onSubmit={handleLogin}>
-//                 <h2>Login</h2>
-
-//                 {error && <p className="error">{error}</p>}
-
-//                 <input
-//                     placeholder="Email"
-//                     value={email}
-//                     onChange={(e) => setEmail(e.target.value)}
-//                 />
-
-//                 <input
-//                     type="password"
-//                     placeholder="Password"
-//                     value={password}
-//                     onChange={(e) => setPassword(e.target.value)}
-//                 />
-
-//                 <button type="submit">Login</button>
-
-//                 <span
-//                     style={{ color: "#38bdf8", cursor: "pointer" }}
-//                     onClick={() => window.location.reload()}
-//                 >
-//                     Register
-//                 </span>
-
-//             </form>
-//         </div>
-//     );
-// }
-
-// export default Login;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "../styles/auth.css";
+import { loginUser } from "../services/authService";
 
-function Login({ onLogin, onRegister }) {
+function Login({ onLogin }) {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    setError("");
 
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-
-    if (!savedUser) {
-      setError("No user found. Please register first.");
+    if (!email || !password) {
+      setError("Email and password are required");
       return;
     }
 
-    if (email !== savedUser.email || password !== savedUser.password) {
-      setError("Invalid email or password");
-      return;
-    }
+    try {
+      setLoading(true);
 
-    onLogin(savedUser.role);
+      /**
+       * EXPECTED backend response:
+       * {
+       *   token: "JWT_TOKEN",
+       *   user: {
+       *     id,
+       *     email,
+       *     role
+       *   }
+       * }
+       */
+      const data = await loginUser({ email, password });
+
+      if (!data?.token || !data?.user) {
+        throw new Error("Invalid login response");
+      }
+
+      // 🔐 store JWT
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // update app auth state
+      onLogin(data.user);
+
+      // 🚀 redirect
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-container">
-      <form className="auth-card" onSubmit={handleLogin}>
+      <form className="auth-card" onSubmit={(e) => e.preventDefault()}>
         <h2>Login</h2>
 
         {error && <p className="error">{error}</p>}
 
         <input
+          type="email"
           placeholder="Email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -125,20 +73,20 @@ function Login({ onLogin, onRegister }) {
         <input
           type="password"
           placeholder="Password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button type="submit">Login</button>
+        <button type="button" onClick={handleLogin} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
         <p style={{ marginTop: "10px", fontSize: "14px" }}>
           Don’t have an account?{" "}
-          <span
-            style={{ color: "#38bdf8", cursor: "pointer" }}
-            onClick={onRegister}
-          >
+          <Link to="/register" style={{ color: "#38bdf8" }}>
             Register
-          </span>
+          </Link>
         </p>
       </form>
     </div>

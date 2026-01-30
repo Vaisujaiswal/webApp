@@ -326,4 +326,102 @@ body {
   .main {
     margin-left: 0;
   }
+<<<<<<< HEAD
 }
+=======
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid #1e293b;
+  text-align: left;
+}
+
+th {
+  color: #94a3b8;
+}
+
+.calc-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 25px;
+  max-width: 500px;
+  color: #e5e7eb;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+}
+
+/* INPUTS INSIDE CHART CARDS (DEVICES PAGE FIX) */
+.chart-card input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+
+  background: #020617;        /* dark */
+  color: #e5e7eb;
+
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  outline: none;
+
+  transition: all 0.25s ease;
+}
+
+.chart-card input::placeholder {
+  color: #64748b;
+}
+
+.chart-card input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+
+/* ADD DEVICE ROW */
+.add-device-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 14px;
+  margin-top: 15px;
+  align-items: center;
+}
+
+/* ADD BUTTON */
+.add-device-btn {
+  padding: 10px 16px;
+  background: #38bdf8;
+  color: #020617;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  transition: all 0.25s ease;
+}
+
+.add-device-btn:hover {
+  background: #0ea5e9;
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+}
+
+/* RESPONSIVE FIX */
+@media (max-width: 768px) {
+  .add-device-row {
+    grid-template-columns: 1fr;
+  }
+
+  .add-device-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+>>>>>>> c9c53636b45ab5f729feb35131d9d604c269b8b6

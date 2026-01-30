@@ -1,11 +1,27 @@
+import { useEffect, useState } from "react";
 import StatCard from "../components/StatCard";
 import EnergyChart from "../components/EnergyChart";
 import RecommendationCard from "../components/RecommendationCard";
 import EfficiencyMeter from "../components/EfficiencyMeter";
 import "../styles/dashboard.css";
 import { FaRupeeSign, FaBolt, FaBullseye } from "react-icons/fa";
+import { generateRecommendations } from "../utils/recommendationEngine";
 
 function DashboardHome() {
+  const [recommendations, setRecommendations] = useState([]);
+
+  // TEMP: replace later with real API data
+  const usageData = {
+    nightUsageHigh: true,
+    acUsageHigh: true,
+    idleDevicesDetected: false,
+  };
+
+  useEffect(() => {
+    const recs = generateRecommendations(usageData);
+    setRecommendations(recs);
+  }, []);
+
   return (
     <>
       <div className="stats">
@@ -18,10 +34,15 @@ function DashboardHome() {
         <EnergyChart />
 
         <div className="recommendations">
-          <h3>Optimization Tips</h3>
-          <RecommendationCard text="Set AC to 24°C after 10 PM → Save ₹100/day" />
-          <RecommendationCard text="Run washing machine after 10 PM" />
-          <RecommendationCard text="Turn off idle devices at night" />
+          <h3>Smart Suggestions</h3>
+
+          {recommendations.map((rec, index) => (
+            <RecommendationCard
+              key={index}
+              text={rec.text}
+              meta={`Confidence: ${rec.confidence}`}
+            />
+          ))}
         </div>
       </div>
 

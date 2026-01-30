@@ -1,14 +1,50 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const energySchema = new mongoose.Schema({
-  hour: String,
-  usage: Number,
-  cost: Number,
-  device: String,
-  date: {
-    type: Date,
-    default: Date.now
+const energySchema = new mongoose.Schema(
+  {
+    /* =========================
+       OWNER (VERY IMPORTANT)
+    ========================= */
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
+    /* =========================
+       ENERGY DATA
+    ========================= */
+    hour: {
+      type: String, // e.g. "14:00"
+      required: true,
+    },
+
+    usage: {
+      type: Number, // kWh
+      required: true,
+    },
+
+    cost: {
+      type: Number, // ₹
+      required: true,
+    },
+
+    device: {
+      type: String,
+      trim: true,
+    },
+
+    date: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
+  },
+  {
+    timestamps: true,
+    strict: true,
   }
-});
+);
 
-module.exports = mongoose.model("EnergyUsage", energySchema);
+export default mongoose.model("EnergyUsage", energySchema);

@@ -1,10 +1,25 @@
-const express = require("express");
-const router = express.Router();
-const Energy = require("../models/EnergyUsage");
+import express from "express";
+import Energy from "../models/EnergyUsage.js";
 
+const router = express.Router();
+
+/* =========================
+   GET TODAY'S ENERGY DATA
+   (Protected by verifyToken)
+========================= */
 router.get("/today", async (req, res) => {
-  const data = await Energy.find();
-  res.json(data);
+  try {
+    const userId = req.user.id; // set by authMiddleware
+
+    const data = await Energy.find({ user: userId });
+
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error("ENERGY TODAY ERROR:", error);
+    return res.status(500).json({
+      message: "Failed to fetch energy data",
+    });
+  }
 });
 
-module.exports = router;
+export default router;
