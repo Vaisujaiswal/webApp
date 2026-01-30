@@ -12,6 +12,8 @@ import {
 } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
+import { FaEnvelopeOpenText } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function Sidebar({ onLogout }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -85,6 +87,15 @@ function Sidebar({ onLogout }) {
     badge: null,
     color: "#ff0101",
     },
+
+    {
+  path: "/dashboard/contact",
+  icon: <FaEnvelopeOpenText />,
+  label: "Contact Us",
+  badge: null,
+  color: "#38bdf8",
+},
+
   ];
 
   /* =========================
