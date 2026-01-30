@@ -1,277 +1,275 @@
-// import { useState } from "react";
-// import "../styles/dashboard.css";
 
-// function ElectricityCalculator() {
-//   const [power, setPower] = useState("");
-//   const [hours, setHours] = useState("");
-//   const [durationType, setDurationType] = useState("days");
-//   const [duration, setDuration] = useState("");
-//   const [tariff, setTariff] = useState("");
-//   const [result, setResult] = useState(null);
-//   const [error, setError] = useState("");
-
-//   const calculate = () => {
-//     const powerNum = parseFloat(power);
-//     const hoursNum = parseFloat(hours);
-//     const durationNum = parseFloat(duration);
-//     const tariffNum = parseFloat(tariff);
-
-//     if (
-//       isNaN(powerNum) ||
-//       isNaN(hoursNum) ||
-//       isNaN(durationNum) ||
-//       isNaN(tariffNum)
-//     ) {
-//       setError("Please enter all values correctly");
-//       return;
-//     }
-
-//     setError("");
-
-//     const days =
-//       durationType === "months" ? durationNum * 30 : durationNum;
-
-//     const energy = (powerNum * hoursNum * days) / 1000;
-//     const cost = energy * tariffNum;
-
-//     setResult({
-//       days,
-//       energy: energy.toFixed(2),
-//       cost: cost.toFixed(2),
-//     });
-//   };
-
-//   return (
-//     <div className="calculator-card">
-//       <h2>Electricity Consumption Calculator</h2>
-
-//       {error && <p className="error">{error}</p>}
-
-//       <label>Appliance Power (Watts)</label>
-//       <input
-//         type="number"
-//         placeholder="e.g. 1500"
-//         value={power}
-//         onChange={(e) => setPower(e.target.value)}
-//       />
-
-//       <label>Usage Hours (per day)</label>
-//       <input
-//         type="number"
-//         placeholder="e.g. 5"
-//         value={hours}
-//         onChange={(e) => setHours(e.target.value)}
-//       />
-
-//       <label>Duration Type</label>
-//       <select
-//         value={durationType}
-//         onChange={(e) => setDurationType(e.target.value)}
-//       >
-//         <option value="days">Days</option>
-//         <option value="months">Months</option>
-//       </select>
-
-//       <label>Duration Value</label>
-//       <input
-//         type="number"
-//         placeholder="e.g. 30"
-//         value={duration}
-//         onChange={(e) => setDuration(e.target.value)}
-//       />
-
-//       <label>Tariff (₹ per kWh)</label>
-//       <input
-//         type="number"
-//         placeholder="e.g. 7"
-//         value={tariff}
-//         onChange={(e) => setTariff(e.target.value)}
-//       />
-
-//       <button onClick={calculate}>Calculate</button>
-
-//       {result && (
-//         <div className="calculator-result">
-//           <p><strong>Total Days:</strong> {result.days}</p>
-//           <p><strong>Energy Consumed:</strong> {result.energy} kWh</p>
-//           <p><strong>Estimated Cost:</strong> ₹{result.cost}</p>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default ElectricityCalculator;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import "../styles/calculator.css";
 
+// Constants
+const TARIFF_RATES = {
+  IESCO: 7,
+  "Tata Power": 8,
+  Adani: 9,
+  BEST: 6,
+};
+
+const GST_RATE = 0.17;
+const DAYS_PER_MONTH = 30;
+const WATTS_TO_KW = 1000;
+const EFFICIENCY_SAVINGS_RATE = 0.1;
+
+const APPLIANCE_DEFAULTS = {
+  lights: 60,
+  fans: 75,
+  ac: 1500,
+  fridge: 200,
+  computer: 300,
+  other: 100,
+};
+
+const APPLIANCE_LABELS = {
+  lights: "Lights",
+  fans: "Fans",
+  ac: "Air Conditioner",
+  fridge: "Refrigerator",
+  computer: "Computer",
+  other: "Other Appliances",
+};
+
+/**
+ * ResultItem Component
+ * Displays individual calculation result with styling options
+ */
+function ResultItem({ label, value, description, highlight, important, positive }) {
+  const classNames = [
+    "result-item",
+    highlight && "result-item--highlight",
+    important && "result-item--important",
+    positive && "result-item--positive",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className={classNames}>
+      <p className="result-label">{label}</p>
+      <p className="result-value">{value}</p>
+      <small className="result-description">{description}</small>
+    </div>
+  );
+}
+
+/**
+ * ElectricityCalculator Component
+ * Calculates monthly electricity consumption and cost based on appliance usage
+ */
 function ElectricityCalculator() {
-  const [company, setCompany] = useState("IESCO");
-  const [hours, setHours] = useState(5);
+  // State Management
+  const [selectedCompany, setSelectedCompany] = useState("IESCO");
+  const [dailyUsageHours, setDailyUsageHours] = useState(5);
+  const [applianceWattages, setApplianceWattages] = useState(APPLIANCE_DEFAULTS);
+  const [calculationResult, setCalculationResult] = useState(null);
 
-  const [appliances, setAppliances] = useState({
-    lights: 60,
-    fans: 75,
-    ac: 1500,
-    fridge: 200,
-    computer: 300,
-    other: 100
-  });
+  // Memoized tariff rate
+  const currentTariffRate = useMemo(
+    () => TARIFF_RATES[selectedCompany],
+    [selectedCompany]
+  );
 
-  const [result, setResult] = useState(null);
+  /**
+   * Updates individual appliance wattage
+   */
+  const handleApplianceChange = useCallback((appliance, value) => {
+    const numericValue = Math.max(0, Number(value) || 0);
+    setApplianceWattages((prev) => ({
+      ...prev,
+      [appliance]: numericValue,
+    }));
+  }, []);
 
-  const tariffMap = {
-    IESCO: 7,
-    Tata: 8,
-    Adani: 9,
-    BEST: 6
-  };
+  /**
+   * Updates daily usage hours with validation
+   */
+  const handleHoursChange = useCallback((value) => {
+    const numericValue = Math.min(24, Math.max(0, Number(value) || 0));
+    setDailyUsageHours(numericValue);
+  }, []);
 
-  const handleChange = (name, value) => {
-    setAppliances({ ...appliances, [name]: value });
-  };
+  /**
+   * Performs electricity cost calculation
+   */
+  const calculateElectricityCost = useCallback(() => {
+    // Calculate total power consumption
+    const totalPowerWatts = Object.values(applianceWattages).reduce(
+      (sum, wattage) => sum + wattage,
+      0
+    );
 
-  const calculate = () => {
-    const totalPower =
-      appliances.lights +
-      appliances.fans +
-      appliances.ac +
-      appliances.fridge +
-      appliances.computer +
-      appliances.other;
+    // Calculate monthly units (kWh)
+    const monthlyUnits =
+      (totalPowerWatts * dailyUsageHours * DAYS_PER_MONTH) / WATTS_TO_KW;
 
-    const units = (totalPower * hours * 30) / 1000;
-    const cost = units * tariffMap[company];
-    const gst = cost * 0.17;
-    const totalBill = cost + gst;
+    // Calculate costs
+    const baseCost = monthlyUnits * currentTariffRate;
+    const gstAmount = baseCost * GST_RATE;
+    const totalBill = baseCost + gstAmount;
 
-    setResult({
-      units: units.toFixed(2),
-      cost: cost.toFixed(2),
-      totalBill: totalBill.toFixed(2),
-      saved: (units * 0.1).toFixed(2),
-      savingPercent: 10
+    // Calculate potential savings
+    const potentialSavings = monthlyUnits * EFFICIENCY_SAVINGS_RATE;
+    const savingsPercentage = EFFICIENCY_SAVINGS_RATE * 100;
+
+    setCalculationResult({
+      totalPowerWatts,
+      monthlyUnits,
+      baseCost,
+      gstAmount,
+      totalBill,
+      potentialSavings,
+      savingsPercentage,
     });
+  }, [applianceWattages, dailyUsageHours, currentTariffRate]);
+
+  /**
+   * Formats currency values
+   */
+  const formatCurrency = (value) => {
+    return `₹${value.toFixed(2)}`;
+  };
+
+  /**
+   * Formats energy units
+   */
+  const formatUnits = (value) => {
+    return `${value.toFixed(2)} kWh`;
   };
 
   return (
     <div className="calc-card">
-      <h2>Electricity Consumption Calculator</h2>
+      <header className="calc-header">
+        <h2>Electricity Consumption Calculator</h2>
+        <p className="calc-subtitle">
+          Estimate your monthly electricity bill and potential savings
+        </p>
+      </header>
 
-      <label>Select Your Electricity Distribution Company</label>
-      <select value={company} onChange={(e) => setCompany(e.target.value)}>
-        <option value="IESCO">IESCO</option>
-        <option value="Tata">Tata Power</option>
-        <option value="Adani">Adani</option>
-        <option value="BEST">BEST</option>
-      </select>
+      {/* Company Selection */}
+      <section className="calc-section">
+        <label htmlFor="company-select" className="calc-label">
+          Electricity Distribution Company
+        </label>
+        <select
+          id="company-select"
+          value={selectedCompany}
+          onChange={(e) => setSelectedCompany(e.target.value)}
+          className="calc-select"
+          aria-label="Select electricity company"
+        >
+          {Object.keys(TARIFF_RATES).map((company) => (
+            <option key={company} value={company}>
+              {company} - {formatCurrency(TARIFF_RATES[company])}/kWh
+            </option>
+          ))}
+        </select>
+      </section>
 
-      <div className="grid">
-        <input
-          type="number"
-          placeholder="Lights (W)"
-          value={appliances.lights}
-          onChange={(e) => handleChange("lights", e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Fans (W)"
-          value={appliances.fans}
-          onChange={(e) => handleChange("fans", e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="AC (W)"
-          value={appliances.ac}
-          onChange={(e) => handleChange("ac", e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Fridge (W)"
-          value={appliances.fridge}
-          onChange={(e) => handleChange("fridge", e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Computer (W)"
-          value={appliances.computer}
-          onChange={(e) => handleChange("computer", e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Other (W)"
-          value={appliances.other}
-          onChange={(e) => handleChange("other", e.target.value)}
-        />
-      </div>
-
-      <label>Average Daily Usage (Hours)</label>
-      <input
-        type="number"
-        value={hours}
-        onChange={(e) => setHours(e.target.value)}
-      />
-
-      <button onClick={calculate}>Calculate</button>
-
-      {result && (
-        <div className="results">
-          <h3>Results</h3>
-
-          <div className="result-item">
-            <p><strong>Total Units Consumed:</strong> {result.units} kWh</p>
-            <small>Monthly electricity consumption</small>
-          </div>
-
-          <div className="result-item">
-            <p><strong>Electricity Cost:</strong> ₹{result.cost}</p>
-            <small>Cost before tax</small>
-          </div>
-
-          <div className="result-item">
-            <p><strong>Total Bill (Including 17% GST):</strong> ₹{result.totalBill}</p>
-            <small>Final payable amount</small>
-          </div>
-
-          <div className="result-item">
-            <p><strong>Energy Saved:</strong> {result.saved} kWh</p>
-            <small>Estimated savings using efficient appliances</small>
-          </div>
-
-          <div className="result-item">
-            <p><strong>Savings (%):</strong> {result.savingPercent}%</p>
-            <small>Reduction compared to normal usage</small>
-          </div>
+      {/* Appliance Inputs */}
+      <section className="calc-section">
+        <h3 className="calc-section-title">Appliance Wattage</h3>
+        <div className="grid">
+          {Object.keys(APPLIANCE_DEFAULTS).map((appliance) => (
+            <div key={appliance} className="input-wrapper">
+              <label htmlFor={`appliance-${appliance}`} className="sr-only">
+                {APPLIANCE_LABELS[appliance]} Wattage
+              </label>
+              <input
+                id={`appliance-${appliance}`}
+                type="number"
+                min="0"
+                placeholder={`${APPLIANCE_LABELS[appliance]} (W)`}
+                value={applianceWattages[appliance]}
+                onChange={(e) =>
+                  handleApplianceChange(appliance, e.target.value)
+                }
+                className="calc-input"
+                aria-label={`${APPLIANCE_LABELS[appliance]} wattage in watts`}
+              />
+            </div>
+          ))}
         </div>
-      )}
+      </section>
 
+      {/* Usage Hours */}
+      <section className="calc-section">
+        <label htmlFor="usage-hours" className="calc-label">
+          Average Daily Usage (Hours)
+        </label>
+        <input
+          id="usage-hours"
+          type="number"
+          min="0"
+          max="24"
+          value={dailyUsageHours}
+          onChange={(e) => handleHoursChange(e.target.value)}
+          className="calc-input"
+          aria-label="Average daily usage hours"
+        />
+        <small className="calc-hint">Maximum 24 hours per day</small>
+      </section>
+
+      {/* Calculate Button */}
+      <button
+        onClick={calculateElectricityCost}
+        className="calc-button"
+        aria-label="Calculate electricity cost"
+      >
+        Calculate Bill
+      </button>
+
+      {/* Results Display */}
+      {calculationResult && (
+        <section className="results" role="region" aria-label="Calculation results">
+          <h3>Your Monthly Estimate</h3>
+
+          <div className="result-grid">
+            <ResultItem
+              label="Total Power Consumption"
+              value={`${calculationResult.totalPowerWatts.toFixed(0)} W`}
+              description="Combined wattage of all appliances"
+            />
+
+            <ResultItem
+              label="Monthly Units Consumed"
+              value={formatUnits(calculationResult.monthlyUnits)}
+              description="Total electricity consumption"
+              highlight={true}
+            />
+
+            <ResultItem
+              label="Base Electricity Cost"
+              value={formatCurrency(calculationResult.baseCost)}
+              description="Cost before taxes"
+            />
+
+            <ResultItem
+              label="GST (17%)"
+              value={formatCurrency(calculationResult.gstAmount)}
+              description="Government sales tax"
+            />
+
+            <ResultItem
+              label="Total Bill"
+              value={formatCurrency(calculationResult.totalBill)}
+              description="Final payable amount"
+              highlight={true}
+              important={true}
+            />
+
+            <ResultItem
+              label="Potential Savings"
+              value={formatUnits(calculationResult.potentialSavings)}
+              description={`~${calculationResult.savingsPercentage}% reduction with energy-efficient appliances`}
+              positive={true}
+            />
+          </div>
+        </section>
+      )}
     </div>
   );
 }

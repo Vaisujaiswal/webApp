@@ -142,6 +142,7 @@ import UsageCosts from "./UsageCosts";
 import Devices from "./Devices";
 import Reports from "./Reports";
 import Emissions from "./Emissions";
+import PrivacyPolicy from "./privacy";
 
 /* =========================
    JWT DECODE (no library)
@@ -208,6 +209,7 @@ function Dashboard({ onLogout }) {
             <Route path="devices" element={<Devices />} />
             <Route path="reports" element={<Reports />} />
             <Route path="emissions" element={<Emissions />} />
+            <Route path="privacy" element={<PrivacyPolicy />} />
           </Routes>
         </div>
       </div>

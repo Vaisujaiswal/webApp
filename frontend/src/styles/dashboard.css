@@ -156,26 +156,26 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
   border-bottom: 1px solid rgba(56, 189, 248, 0.1);
 }
 
 .logo-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 3px;
 }
 
 .logo-icon {
-  width: 42px;
-  height: 42px;
+  width: 35px;
+  height: 30px;
   background: linear-gradient(135deg, #38bdf8, #0ea5e9);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 10px;
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
   animation: logoFloat 3s ease-in-out infinite;
 }
@@ -198,7 +198,7 @@ body::before {
 }
 
 .logo-name {
-  font-size: 18px;
+  font-size: 12px;
   font-weight: 700;
   background: linear-gradient(135deg, #38bdf8, #22c55e);
   -webkit-background-clip: text;
@@ -214,17 +214,17 @@ body::before {
 
 /* Collapse Button */
 .collapse-btn {
-  width: 32px;
-  height: 32px;
+  width: 25px;
+  height: 30px;
   background: rgba(56, 189, 248, 0.1);
   border: 1px solid rgba(56, 189, 248, 0.2);
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #38bdf8;
+  color: #ff0000;
 }
 
 .collapse-btn:hover {
@@ -369,11 +369,11 @@ body::before {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .nav-section {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .nav-label {
@@ -395,11 +395,11 @@ body::before {
 .menu {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 8px;
+  padding: 10px 14px;
   color: #94a3b8;
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: 8px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2140,5 +2140,56 @@ tr:hover {
   
   .topbar-user .user-name {
     display: none;
+  }
+}
+
+/* PRIVACY POLICY PAGE */
+.privacy-page {
+  padding: 25px;
+  max-width: 900px;
+}
+
+.privacy-page h2 {
+  color: #38bdf8;
+  margin-bottom: 5px;
+}
+
+.privacy-updated {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 25px;
+}
+
+.privacy-page section {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.privacy-page h3 {
+  color: #22c55e;
+  margin-bottom: 10px;
+}
+
+.privacy-page p {
+  color: #e5e7eb;
+  line-height: 1.6;
+}
+
+.privacy-page ul {
+  padding-left: 18px;
+}
+
+.privacy-page li {
+  margin-bottom: 6px;
+  color: #cbd5f5;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .privacy-page {
+    padding: 15px;
   }
 }

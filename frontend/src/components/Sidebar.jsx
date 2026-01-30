@@ -61,7 +61,7 @@ function Sidebar({ onLogout }) {
       path: "/dashboard/devices",
       icon: <FaPlug />,
       label: "Devices",
-      badge: "5",
+      // badge: "5",
       color: "#ff6b6b",
     },
     {
@@ -75,8 +75,15 @@ function Sidebar({ onLogout }) {
       path: "/dashboard/emissions",
       icon: <FaLeaf />,
       label: "Emissions",
-      badge: "New",
-      color: "#37b679",
+      // badge: "New",
+      // color: "#37b679",
+    },
+    {
+    path: "/dashboard/privacy",
+    icon: <FaFileAlt />,
+    label: "Privacy Policy",
+    badge: null,
+    color: "#ff0101",
     },
   ];
 
@@ -190,15 +197,15 @@ function Sidebar({ onLogout }) {
             ))}
           </div>
 
-          {!isCollapsed && (
+          {/* {!isCollapsed && (
             <div className="nav-section quick-actions">
               <span className="nav-label">QUICK ACTIONS</span>
               <button className="quick-action-btn">
-                <FaCog />
-                <span>Settings</span>
+                <FaFileAlt />
+                <span>privacy policy</span>
               </button>
             </div>
-          )}
+          )} */}
         </nav>
       </div>
 
