@@ -171,3 +171,33 @@
     transform: translateY(0);
   }
 }
+
+
+
+
+
+
+/* SIDEBAR LAYOUT FIX */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* LOGOUT STYLE */
+.logout {
+  color: #f87171;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #1e293b;
+  transition: all 0.25s ease;
+}
+
+.logout:hover {
+  color: #ef4444;
+  padding-left: 8px;
+}

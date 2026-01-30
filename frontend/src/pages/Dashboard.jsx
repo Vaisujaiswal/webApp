@@ -1,35 +1,39 @@
+
 // import Sidebar from "../components/Sidebar";
 // import TopBar from "../components/TopBar";
 // import StatCard from "../components/StatCard";
 // import EnergyChart from "../components/EnergyChart";
 // import RecommendationCard from "../components/RecommendationCard";
 // import EfficiencyMeter from "../components/EfficiencyMeter";
+// import "../styles/dashboard.css";
+// import { FaRupeeSign, FaBolt, FaBullseye } from "react-icons/fa";
 
-// function Dashboard() {
+// function Dashboard({ role }) {
 //   return (
-//     <div style={{ display: "flex" }}>
+//     <div className="app">
 //       <Sidebar />
 
-//       <div style={{ flex: 1 }}>
+//       <div className="main">
 //         <TopBar />
 
-//         <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-//           <StatCard title="Total Cost" value="₹1450" />
-//           <StatCard title="Usage Today" value="32.5 kWh" />
-//           <StatCard title="Efficiency" value="78%" />
+//         <div className="stats">
+//           <StatCard title="Total Cost" value="₹1450" icon={<FaRupeeSign />} />
+//           <StatCard title="Usage Today" value="32.5 kWh" icon={<FaBolt />} />
+//           <StatCard title="Efficiency" value="78%" icon={<FaBullseye />} />
 //         </div>
 
-//         <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
+//         <div className="content">
 //           <EnergyChart />
 
-//           <div>
+//           <div className="recommendations">
 //             <h3>Optimization Tips</h3>
-//             <RecommendationCard text="Run AC after 10 PM to save ₹100/day" />
-//             <RecommendationCard text="Use washing machine at night" />
+//             <RecommendationCard text="Set AC to 24°C after 10 PM → Save ₹100/day" />
+//             <RecommendationCard text="Run washing machine after 10 PM" />
+//             <RecommendationCard text="Turn off idle devices at night" />
 //           </div>
 //         </div>
 
-//         <div style={{ padding: "20px" }}>
+//         <div className="bottom">
 //           <EfficiencyMeter />
 //         </div>
 //       </div>
@@ -38,13 +42,6 @@
 // }
 
 // export default Dashboard;
-
-
-
-
-
-
-
 
 
 
@@ -76,18 +73,33 @@ import EfficiencyMeter from "../components/EfficiencyMeter";
 import "../styles/dashboard.css";
 import { FaRupeeSign, FaBolt, FaBullseye } from "react-icons/fa";
 
-function Dashboard({ role }) {
+import { Routes, Route } from "react-router-dom";
+import DashboardHome from "./DashboardHome";
+import UsageCosts from "./UsageCosts";
+import Devices from "./Devices";
+import Reports from "./Reports";
+import Emissions from "./Emissions";
+
+function Dashboard({ role, onLogout }) {
   return (
     <div className="app">
-      <Sidebar />
+      <Sidebar onLogout={onLogout} />
 
       <div className="main">
         <TopBar />
 
+         <Routes>
+          <Route path="/" element={<DashboardHome />} />
+          <Route path="/usage" element={<UsageCosts />} />
+          <Route path="/devices" element={<Devices />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/emissions" element={<Emissions />} />
+        </Routes>
+
         <div className="stats">
           <StatCard title="Total Cost" value="₹1450" icon={<FaRupeeSign />} />
-<StatCard title="Usage Today" value="32.5 kWh" icon={<FaBolt />} />
-<StatCard title="Efficiency" value="78%" icon={<FaBullseye />} />
+          <StatCard title="Usage Today" value="32.5 kWh" icon={<FaBolt />} />
+          <StatCard title="Efficiency" value="78%" icon={<FaBullseye />} />
         </div>
 
         <div className="content">
