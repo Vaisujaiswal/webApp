@@ -3,20 +3,43 @@ import {
   FaBolt,
   FaPlug,
   FaFileAlt,
-  FaLeaf
+  FaLeaf,
+  FaSignOutAlt
 } from "react-icons/fa";
 import "../styles/dashboard.css";
+import { NavLink } from "react-router-dom";
 
-function Sidebar() {
+
+function Sidebar({ onLogout }) {
   return (
     <div className="sidebar">
-      <h2>⚡ SmartEnergy</h2>
+      <div>
+        <h2>⚡ SmartEnergy</h2>
 
-      <p><FaChartPie /> Dashboard</p>
-      <p><FaBolt /> Usage & Costs</p>
-      <p><FaPlug /> Devices</p>
-      <p><FaFileAlt /> Reports</p>
-      <p><FaLeaf /> Emissions</p>
+        <NavLink to="/" end className="menu">
+          <FaChartPie /> Dashboard
+        </NavLink>
+
+        <NavLink to="/usage" className="menu">
+          <FaBolt /> Usage & Costs
+        </NavLink>
+
+        <NavLink to="/devices" className="menu">
+          <FaPlug /> Devices
+        </NavLink>
+
+        <NavLink to="/reports" className="menu">
+          <FaFileAlt /> Reports
+        </NavLink>
+
+        <NavLink to="/emissions" className="menu">
+          <FaLeaf /> Emissions
+        </NavLink>
+      </div>
+
+      <p className="logout" onClick={onLogout}>
+        <FaSignOutAlt /> Logout
+      </p>
     </div>
   );
 }
