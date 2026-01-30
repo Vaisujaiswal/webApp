@@ -45,38 +45,38 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/dashboard.css";
-
+import { FaLeaf } from "react-icons/fa";
 /* =========================
    PAGE CONTEXT CONFIG
 ========================= */
-const pageConfig = {
-  "/dashboard": {
-    title: "Dashboard Overview",
-    search: "Search insights, stats...",
-  },
-  "/dashboard/usage": {
-    title: "Usage & Costs",
-    search: "Search usage data...",
-  },
-  "/dashboard/devices": {
-    title: "Devices",
-    search: "Search connected devices...",
-  },
-  "/dashboard/reports": {
-    title: "Reports",
-    search: "Search reports...",
-  },
-  "/dashboard/emissions": {
-    title: "Emissions",
-    search: "Search emission data...",
-  },
-};
+// const pageConfig = {
+//   "/dashboard": {
+//     title: "Dashboard Overview",
+//     search: "Search insights, stats...",
+//   },
+//   "/dashboard/usage": {
+//     title: "Usage & Costs",
+//     search: "Search usage data...",
+//   },
+//   "/dashboard/devices": {
+//     title: "Devices",
+//     search: "Search connected devices...",
+//   },
+//   "/dashboard/reports": {
+//     title: "Reports",
+//     search: "Search reports...",
+//   },
+//   "/dashboard/emissions": {
+//     title: "Emissions",
+//     search: "Search emission data...",
+//   },
+// };
 
 function TopBar() {
   const location = useLocation();
 
-  const current =
-    pageConfig[location.pathname] || pageConfig["/dashboard"];
+  // const current =
+  //   pageConfig[location.pathname] || pageConfig["/dashboard"];
 
   /* =========================
      THEME STATE
@@ -97,24 +97,24 @@ function TopBar() {
 
   return (
     <div className="topbar">
-      <div>
-        <h3 style={{ color: "#e5e7eb", fontWeight: 500 }}>
-          {current.title}
-        </h3>
+      <div className="header-content">
+        <h1 className="dashboard-title">
+          <span className="title-icon">⚡</span>
+          Energy Overview
+        </h1>
+        {/* <div className="header-badge">
+          <FaLeaf className="leaf-icon" />
+          <span>Eco Mode Active</span>
+        </div> */}
       </div>
 
-      <input
-        className="topbar-search"
-        placeholder={current.search}
-      />
-
-      <div className="topbar-user">
+      <div className="topbar-right">
         {/* 🌗 THEME TOGGLE */}
         <span
           style={{
             cursor: "pointer",
-            fontSize: "18px",
-            marginRight: "10px",
+            fontSize: "25px",
+            marginRight: "60px",
           }}
           title="Toggle theme"
           onClick={toggleTheme}
