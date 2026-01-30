@@ -1,0 +1,106 @@
+/* CARD */
+.calc-card {
+  max-width: 420px;
+  background: #020617; /* same as dashboard */
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid #1e293b;
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+  color: #e5e7eb;
+}
+
+/* TITLE */
+.calc-card h2 {
+  text-align: center;
+  color: #38bdf8;
+  margin-bottom: 18px;
+  font-size: 20px;
+}
+
+/* LABELS */
+.calc-card label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #cbd5f5;
+  margin-top: 12px;
+  display: block;
+}
+
+/* INPUTS & SELECT */
+.calc-card input,
+.calc-card select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.calc-card input::placeholder {
+  color: #64748b;
+}
+
+.calc-card input:focus,
+.calc-card select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+/* APPLIANCE GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* BUTTON */
+.calc-card button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #020617;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.calc-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+}
+
+/* RESULTS */
+.results {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid #1e293b;
+}
+
+.results h3 {
+  color: #38bdf8;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.results p {
+  font-size: 13px;
+  margin: 4px 0;
+  color: #e5e7eb;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
