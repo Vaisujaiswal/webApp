@@ -244,13 +244,34 @@ function ElectricityCalculator() {
       {result && (
         <div className="results">
           <h3>Results</h3>
-          <p><strong>Total Units Consumed:</strong> {result.units} kWh</p>
-          <p><strong>Electricity Cost:</strong> ₹{result.cost}</p>
-          <p><strong>Total Bill (Including 17% GST):</strong> ₹{result.totalBill}</p>
-          <p><strong>Energy Saved:</strong> {result.saved} kWh</p>
-          <p><strong>Savings (%):</strong> {result.savingPercent}%</p>
+
+          <div className="result-item">
+            <p><strong>Total Units Consumed:</strong> {result.units} kWh</p>
+            <small>Monthly electricity consumption</small>
+          </div>
+
+          <div className="result-item">
+            <p><strong>Electricity Cost:</strong> ₹{result.cost}</p>
+            <small>Cost before tax</small>
+          </div>
+
+          <div className="result-item">
+            <p><strong>Total Bill (Including 17% GST):</strong> ₹{result.totalBill}</p>
+            <small>Final payable amount</small>
+          </div>
+
+          <div className="result-item">
+            <p><strong>Energy Saved:</strong> {result.saved} kWh</p>
+            <small>Estimated savings using efficient appliances</small>
+          </div>
+
+          <div className="result-item">
+            <p><strong>Savings (%):</strong> {result.savingPercent}%</p>
+            <small>Reduction compared to normal usage</small>
+          </div>
         </div>
       )}
+
     </div>
   );
 }
