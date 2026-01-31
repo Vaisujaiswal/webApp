@@ -15,7 +15,7 @@ import {
 import "../styles/dashboard.css";
 import { useEffect, useState, useMemo } from "react";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://webapp-c14r.onrender.com/api";
 
 function Reports() {
   const [devices, setDevices] = useState([]);

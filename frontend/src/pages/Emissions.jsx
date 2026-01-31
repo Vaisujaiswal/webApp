@@ -16,7 +16,7 @@ import {
 
 import { useEnergyReports } from "../hooks/useEnergyReports";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://webapp-c14r.onrender.com/api";
 
 function Emissions() {
   const { loading: energyLoading, monthlyUnits = 0 } = useEnergyReports();
