@@ -141,7 +141,23 @@ function Emissions() {
             <LineChart data={trend}>
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip />
+              {/* <Tooltip /> */}
+              <Tooltip
+  formatter={(value) => [`${value} kg CO₂`, "Emissions"]}
+  contentStyle={{
+    backgroundColor: "#020617",   // dark glass
+    border: "1px solid #22c55e",  // green border
+    borderRadius: "10px",
+    color: "#ffffff",
+    fontSize: "14px",
+  }}
+  labelStyle={{
+    color: "#22c55e",             // ✅ MONTH COLOR
+    fontWeight: "600",
+    marginBottom: "4px",
+  }}
+/>
+
               <Line
                 type="monotone"
                 dataKey="co2"

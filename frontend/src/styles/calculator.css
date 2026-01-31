@@ -1,3 +1,18 @@
+/* Remove number input arrows (Chrome, Edge, Safari) */
+.calc-input::-webkit-outer-spin-button,
+.calc-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove number input arrows (Firefox) */
+.calc-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+
+
 /* =======================
    PAGE LAYOUT
 ======================= */

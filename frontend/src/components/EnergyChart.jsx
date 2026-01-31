@@ -109,24 +109,49 @@ function EnergyChart({ data: externalData = null }) {
           <LineChart data={chartData}>
             <XAxis
               dataKey="hour"
-              stroke="#94a3b8"
+              stroke="#ffffff"
               interval="preserveStartEnd"
             />
             <YAxis
-              stroke="#94a3b8"
+              stroke="#ffffff"
               allowDecimals={false}
             />
             <Tooltip
               formatter={(value) => [`${value} kWh`, "Usage"]}
+              contentStyle={{
+                backgroundColor: "#020617",   // dark glass
+                border: "1px solid #38bdf8",
+                borderRadius: "10px",
+                color: "#ffffff",
+                fontSize: "14px",
+              }}
+              labelStyle={{
+                color: "#38bdf8",             // ✅ DEVICE NAME COLOR
+                fontWeight: "600",
+                marginBottom: "4px",
+              }}
             />
+
             <Line
               type="monotone"
               dataKey="usage"
-              stroke="#38bdf8"
-              strokeWidth={3}
-              dot={false}
+              stroke="#38bdf8"          // NEON BLUE (same as theme highlight)
+              strokeWidth={4}
+              dot={{
+                r: 6,
+                fill: "#38bdf8",
+                stroke: "#ffffff",
+                strokeWidth: 2,
+              }}
+              activeDot={{
+                r: 8,
+                fill: "#ffffff",
+                stroke: "#38bdf8",
+                strokeWidth: 3,
+              }}
               animationDuration={900}
             />
+
           </LineChart>
         </ResponsiveContainer>
       )}

@@ -76,13 +76,23 @@ function ElectricityCalculator() {
   /**
    * Updates individual appliance wattage
    */
-  const handleApplianceChange = useCallback((appliance, value) => {
-    const numericValue = Math.max(0, Number(value) || 0);
+const handleApplianceChange = useCallback((appliance, value) => {
+  // ✅ allow empty input while typing
+  if (value === "") {
     setApplianceWattages((prev) => ({
       ...prev,
-      [appliance]: numericValue,
+      [appliance]: "",
     }));
-  }, []);
+    return;
+  }
+
+  const numericValue = Math.max(0, Number(value));
+  setApplianceWattages((prev) => ({
+    ...prev,
+    [appliance]: numericValue,
+  }));
+}, []);
+
 
   /**
    * Updates daily usage hours with validation

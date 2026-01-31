@@ -11,6 +11,8 @@ function Devices() {
   const [hours, setHours] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [count, setCount] = useState("");
+
 
   const token = localStorage.getItem("token");
 
@@ -49,11 +51,13 @@ function Devices() {
      ADD DEVICE
   ========================= */
   const addDevice = async () => {
-    if (!name || !power || !hours) return;
+    if (!name || !power || !hours || !count) return;
 
     try {
       setLoading(true);
       setError(null);
+
+      const totalPower = Number(power) * Number(count);
 
       const res = await fetch(`${API_BASE}/devices`, {
         method: "POST",
@@ -63,8 +67,9 @@ function Devices() {
         },
         body: JSON.stringify({
           name: name.trim(),
-          power: Number(power),
-          hours: Number(hours), // backend maps → hoursPerDay
+          power: totalPower,          // ✅ multiplied power
+          hours: Number(hours),       // backend → hoursPerDay
+          count: Number(count),       // (optional, future use)
         }),
       });
 
@@ -78,6 +83,7 @@ function Devices() {
       setName("");
       setPower("");
       setHours("");
+      setCount("");
     } catch (err) {
       console.error("ADD DEVICE ERROR:", err);
       setError("Unable to add device");
@@ -85,6 +91,10 @@ function Devices() {
       setLoading(false);
     }
   };
+
+
+
+
 
   /* =========================
      REMOVE DEVICE
@@ -151,6 +161,16 @@ function Devices() {
             onChange={(e) => setPower(e.target.value)}
           />
 
+
+          <input
+            type="number"
+            placeholder="No of devices"
+            value={count}
+            min="1"
+            onChange={(e) => setCount(e.target.value)}
+          />
+
+
           <input
             type="number"
             placeholder="Usage Hours / Day"
@@ -169,6 +189,7 @@ function Devices() {
       </div>
 
       {/* DEVICE LIST */}
+      {/* DEVICE LIST */}
       <div className="chart-card" style={{ marginTop: "20px" }}>
         <h3>My Devices</h3>
 
@@ -180,15 +201,18 @@ function Devices() {
               <tr>
                 <th>Name</th>
                 <th>Power (W)</th>
+                <th>No. of Devices</th>
                 <th>Hours / Day</th>
                 <th></th>
               </tr>
             </thead>
+
             <tbody>
               {devices.map((d) => (
                 <tr key={d._id}>
                   <td>{d.name}</td>
                   <td>{d.power}</td>
+                  <td>{d.count ?? 1}</td>
                   <td>{d.hoursPerDay}</td>
                   <td>
                     <FaTrash
@@ -202,6 +226,7 @@ function Devices() {
           </table>
         )}
       </div>
+
 
       {/* SUMMARY */}
       <div className="chart-card" style={{ marginTop: "20px" }}>
