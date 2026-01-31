@@ -153,3 +153,61 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+
+
+/* =======================
+   USAGE ADVICE CARD
+======================= */
+.advice-card {
+  margin-top: 22px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid #1e293b;
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.advice-card h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.advice-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.advice-card li {
+  font-size: 14px;
+  color: #cbd5f5;
+  margin-bottom: 6px;
+}
+
+/* Advice levels */
+.advice-high h4 {
+  color: #ef4444; /* red */
+}
+
+.advice-medium h4 {
+  color: #facc15; /* yellow */
+}
+
+.advice-low h4 {
+  color: #22c55e; /* green */
+}

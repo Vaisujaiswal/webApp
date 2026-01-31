@@ -11,13 +11,34 @@ import {
 
 const API_BASE = "http://localhost:5000/api";
 
-function EnergyChart() {
+/**
+ * EnergyChart
+ * - If `data` prop is provided → use it (Dashboard)
+ * - Else → fetch /energy/today (detailed view / future use)
+ */
+function EnergyChart({ data: externalData = null }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  /* =========================
+     FETCH ONLY IF NEEDED
+  ========================= */
   useEffect(() => {
     let isMounted = true;
 
+    // 👉 If parent already gave data, DO NOT fetch
+    if (externalData && Array.isArray(externalData)) {
+      const formatted = externalData.map((d) => ({
+        hour: d.name,
+        usage: Number(d.usage.toFixed(2)),
+      }));
+
+      setData(formatted);
+      setLoading(false);
+      return;
+    }
+
+    // 👉 Otherwise fetch from backend
     const fetchEnergyData = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -42,11 +63,7 @@ function EnergyChart() {
 
         raw.forEach((item) => {
           const hour = new Date(item.date).getHours();
-
-          if (!hourMap[hour]) {
-            hourMap[hour] = 0;
-          }
-
+          if (!hourMap[hour]) hourMap[hour] = 0;
           hourMap[hour] += Number(item.usage);
         });
 
@@ -58,9 +75,7 @@ function EnergyChart() {
           usage: Number((hourMap[h] || 0).toFixed(2)),
         }));
 
-        if (isMounted) {
-          setData(formatted);
-        }
+        if (isMounted) setData(formatted);
       } catch (err) {
         console.error("ENERGY CHART ERROR:", err);
         if (isMounted) setData([]);
@@ -74,7 +89,7 @@ function EnergyChart() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [externalData]);
 
   const chartData = useMemo(() => data, [data]);
 
@@ -84,9 +99,10 @@ function EnergyChart() {
 
       {loading ? (
         <p style={{ opacity: 0.6 }}>Loading chart…</p>
-      ) : chartData.every((d) => d.usage === 0) ? (
+      ) : chartData.length === 0 ||
+        chartData.every((d) => d.usage === 0) ? (
         <p style={{ opacity: 0.6 }}>
-          No energy data available for today
+          No energy data available
         </p>
       ) : (
         <ResponsiveContainer width="100%" height={280}>
@@ -94,7 +110,7 @@ function EnergyChart() {
             <XAxis
               dataKey="hour"
               stroke="#94a3b8"
-              interval={2} // ✅ less clutter
+              interval="preserveStartEnd"
             />
             <YAxis
               stroke="#94a3b8"
