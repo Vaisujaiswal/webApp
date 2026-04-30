@@ -16,7 +16,7 @@ import {
 
 import { useEnergyReports } from "../hooks/useEnergyReports";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = process.env.REACT_APP_API;
 
 function Emissions() {
   const { loading: energyLoading, monthlyUnits = 0 } = useEnergyReports();

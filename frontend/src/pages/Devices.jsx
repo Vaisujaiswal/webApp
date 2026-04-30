@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "../styles/dashboard.css";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = process.env.REACT_APP_API;
 
 function Devices() {
   const [devices, setDevices] = useState([]);
