@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "../styles/dashboard.css";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
-const API_BASE = "https://webapp-c14r.onrender.com/api";
+const API_BASE = "http://localhost:5000/api";
 
 function Devices() {
   const [devices, setDevices] = useState([]);
@@ -51,13 +51,22 @@ function Devices() {
      ADD DEVICE
   ========================= */
   const addDevice = async () => {
-    if (!name || !power || !hours || !count) return;
+    if (!name || !power || !hours) {
+      setError("Please fill all required fields");
+      return;
+    }
+
+    if (!token) {
+      setError("User not authenticated");
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
-      const totalPower = Number(power) * Number(count);
+      const deviceCount = Number(count) || 1;
+      const totalPower = Number(power) * deviceCount;
 
       const res = await fetch(`${API_BASE}/devices`, {
         method: "POST",
@@ -67,18 +76,19 @@ function Devices() {
         },
         body: JSON.stringify({
           name: name.trim(),
-          power: totalPower,          // ✅ multiplied power
-          hours: Number(hours),       // backend → hoursPerDay
-          count: Number(count),       // (optional, future use)
+          power: Number(power),
+          hours: Number(hours),
         }),
       });
 
+      const data = await res.json();
+      console.log("ADD DEVICE RESPONSE:", data);
+
       if (!res.ok) {
-        throw new Error("Failed to add device");
+        throw new Error(data.message || "Failed to add device");
       }
 
-      const newDevice = await res.json();
-      setDevices((prev) => [newDevice, ...prev]);
+      setDevices((prev) => [data, ...prev]);
 
       setName("");
       setPower("");
@@ -86,7 +96,7 @@ function Devices() {
       setCount("");
     } catch (err) {
       console.error("ADD DEVICE ERROR:", err);
-      setError("Unable to add device");
+      setError(err.message || "Unable to add device");
     } finally {
       setLoading(false);
     }
@@ -212,7 +222,6 @@ function Devices() {
                 <tr key={d._id}>
                   <td>{d.name}</td>
                   <td>{d.power}</td>
-                  <td>{d.count ?? 1}</td>
                   <td>{d.hoursPerDay}</td>
                   <td>
                     <FaTrash
