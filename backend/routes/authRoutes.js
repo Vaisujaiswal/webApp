@@ -8,6 +8,7 @@ const router = express.Router();
 /* =========================
    HELPER: GENERATE JWT
 ========================= */
+
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -17,9 +18,7 @@ const generateToken = (user) => {
       role: user.role,
     },
     process.env.JWT_SECRET,
-    {
-      expiresIn: "1h",
-    }
+    { expiresIn: "1h" }
   );
 };
 
@@ -56,6 +55,7 @@ router.post("/register", async (req, res) => {
       token,
       user: {
         id: user._id,
+        name: user.name,     // ✅ ADD THIS
         email: user.email,
         role: user.role,
       },
@@ -103,6 +103,7 @@ router.post("/login", async (req, res) => {
       token,
       user: {
         id: user._id,
+        name: user.name,     // ✅ ADD THIS
         email: user.email,
         role: user.role,
       },
