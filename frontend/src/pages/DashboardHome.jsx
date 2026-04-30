@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import "../styles/dashboard.css";
+
 import StatCard from "../components/StatCard";
 import EnergyChart from "../components/EnergyChart";
 import RecommendationCard from "../components/RecommendationCard";
-import EfficiencyMeter from "../components/EfficiencyMeter";
-import "../styles/dashboard.css";
 
 import {
   FaRupeeSign,
@@ -11,142 +11,103 @@ import {
   FaBullseye,
 } from "react-icons/fa";
 
+import { useEnergyReports } from "../hooks/useEnergyReports";
 import { generateRecommendations } from "../utils/recommendationEngine";
 
 function DashboardHome() {
-  const [summary, setSummary] = useState(null);
-  const [recommendations, setRecommendations] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [animateStats, setAnimateStats] = useState(false);
-  const [error, setError] = useState(null);
+  const {
+    loading,
+    dailyUnits,
+    monthlyUnits,
+    monthlyCost,
+    deviceUsage,
+  } = useEnergyReports();
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchDashboardSummary = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          throw new Error("Authentication token missing");
-        }
-
-        const res = await fetch(
-          "http://localhost:5000/api/energy/summary",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to load dashboard data");
-        }
-
-        const data = await res.json();
-
-        if (!isMounted) return;
-
-        setSummary(data);
-
-        // Generate recommendations using backend signals
-        const recs = generateRecommendations(data.usageSignals || {});
-        setRecommendations(recs);
-
-        setAnimateStats(true);
-      } catch (err) {
-        console.error("Dashboard fetch error:", err);
-        if (isMounted) {
-          setError("Unable to load dashboard data");
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchDashboardSummary();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  if (error) {
-    return (
-      <div className="dashboard-container">
-        <p className="error">{error}</p>
-      </div>
-    );
-  }
+  /* =====================
+     RECOMMENDATIONS (DERIVED)
+     still frontend, but REAL data
+  ===================== */
+  const recommendations = useMemo(() => {
+    if (loading) return [];
+    return generateRecommendations({
+      dailyUnits,
+      monthlyUnits,
+      deviceUsage,
+    });
+  }, [loading, dailyUnits, monthlyUnits, deviceUsage]);
 
   return (
     <div className="dashboard-container">
       {/* =====================
-          STATS
+          STATS OVERVIEW
       ===================== */}
-      <div className={`stats ${animateStats ? "stats-animate" : ""}`}>
+      <div className="stats stats-animate">
         <StatCard
-          title="Total Cost"
-          value={summary ? `₹${summary.totalCost}` : "—"}
-          icon={<FaRupeeSign />}
-        />
-        <StatCard
-          title="Usage Today"
-          value={summary ? `${summary.usageToday} kWh` : "—"}
+          title="Daily Energy Usage"
+          value={loading ? "—" : `${dailyUnits.toFixed(2)} kWh`}
           icon={<FaBolt />}
         />
+
         <StatCard
-          title="Efficiency"
-          value={summary ? `${summary.efficiency}%` : "—"}
+          title="Monthly Energy Usage"
+          value={loading ? "—" : `${monthlyUnits.toFixed(1)} kWh`}
           icon={<FaBullseye />}
+        />
+
+        <StatCard
+          title="Estimated Monthly Cost"
+          value={loading ? "—" : `₹${monthlyCost.toFixed(0)}`}
+          icon={<FaRupeeSign />}
         />
       </div>
 
       {/* =====================
-          MAIN GRID
+          GRAPH SECTION
       ===================== */}
       <div className="content">
         <div className="chart-section">
-          <h3 className="section-title">Energy Usage Pattern</h3>
-          <EnergyChart />
+          <h3 className="section-title">
+            Energy Usage by Device (Daily)
+          </h3>
+
+          {loading ? (
+            <p style={{ opacity: 0.6 }}>Loading chart…</p>
+          ) : (
+            <EnergyChart data={deviceUsage} />
+          )}
         </div>
 
+        {/* =====================
+            RECOMMENDATIONS
+        ===================== */}
         <div className="recommendations">
           <h3 className="section-title">💡 Smart Suggestions</h3>
-          {recommendations.length === 0 && !isLoading && (
-            <p style={{ opacity: 0.7 }}>No suggestions available</p>
+
+          {loading ? (
+            <p style={{ opacity: 0.6 }}>Analyzing usage…</p>
+          ) : recommendations.length === 0 ? (
+            <p style={{ opacity: 0.6 }}>
+              No recommendations available
+            </p>
+          ) : (
+            recommendations.map((rec, i) => (
+              <RecommendationCard
+                key={i}
+                text={rec.text}
+                meta={`Confidence: ${rec.confidence}`}
+              />
+            ))
           )}
-          {recommendations.map((rec, i) => (
-            <RecommendationCard
-              key={i}
-              text={rec.text}
-              meta={`Confidence: ${rec.confidence}`}
-            />
-          ))}
         </div>
       </div>
 
       {/* =====================
-          FOOTER
+          INFO
       ===================== */}
-      <div className="bottom">
-        <EfficiencyMeter />
+      <div style={{ opacity: 0.7, marginTop: 20 }}>
+        👉 Open <b>Reports</b> for detailed charts, trends, and
+        cost breakdown.
       </div>
-
-      {/* =====================
-          LOADING OVERLAY
-      ===================== */}
-      {isLoading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
     </div>
   );
 }

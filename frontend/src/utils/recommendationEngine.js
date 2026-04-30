@@ -1,8 +1,12 @@
-export function generateRecommendations(usageData) {
+export function generateRecommendations(usageData = {}) {
   const recommendations = [];
 
   // Safety: no extreme advice
   const SAFE_CONFIDENCE = "Medium";
+
+  /* =========================
+     SIGNAL-BASED RECOMMENDATIONS
+  ========================= */
 
   if (usageData.nightUsageHigh) {
     recommendations.push({
@@ -28,13 +32,39 @@ export function generateRecommendations(usageData) {
     });
   }
 
-  if (recommendations.length === 0) {
+  /* =========================
+     FALLBACK INTELLIGENCE
+     (ENSURE 3 SUGGESTIONS)
+  ========================= */
+
+  if (recommendations.length < 3) {
     recommendations.push({
-      text: "Your energy usage looks balanced today. Keep following the same habits.",
+      text: "Monitoring daily usage patterns can help identify appliances that consume more energy than expected.",
       confidence: "Low",
-      reason: "No abnormal pattern detected",
+      reason: "General efficiency insight",
     });
   }
 
-  return recommendations;
+  if (recommendations.length < 3) {
+    recommendations.push({
+      text: "Using energy-efficient appliances can significantly reduce long-term electricity costs.",
+      confidence: "Low",
+      reason: "Efficiency best practice",
+    });
+  }
+
+  if (recommendations.length < 3) {
+    recommendations.push({
+      text: "Running heavy appliances during off-peak hours may help lower your overall energy bill.",
+      confidence: "Low",
+      reason: "Load distribution suggestion",
+    });
+  }
+
+  /* =========================
+     FINAL OUTPUT
+  ========================= */
+
+  // Always return max 3 suggestions
+  return recommendations.slice(0, 3);
 }

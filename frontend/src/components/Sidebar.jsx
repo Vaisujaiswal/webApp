@@ -222,21 +222,7 @@ function Sidebar({ onLogout }) {
 
       {/* BOTTOM */}
       <div className="sidebar-bottom">
-        {!isCollapsed && (
-          <div className="sidebar-stats">
-            <div className="stat-item">
-              <div className="stat-icon">⚡</div>
-              <div className="stat-content">
-                <span className="stat-label">Today's Usage</span>
-                <span className="stat-value">32.5 kWh</span>
-              </div>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: "65%" }}></div>
-            </div>
-            <span className="stat-note">65% of daily target</span>
-          </div>
-        )}
+      
 
         {/* 🔥 WORKING LOGOUT */}
         <button className="logout" onClick={handleLogout} title="Logout">

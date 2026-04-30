@@ -895,6 +895,7 @@ body::before {
    ============================================ */
 
 .dashboard-container {
+  margin: 30px;
   position: relative;
   min-height: 100%;
 }
