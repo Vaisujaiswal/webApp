@@ -17,13 +17,23 @@ const app = express();
 ========================= */
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://energyconsumption.netlify.app" // 👈 YOUR NETLIFY URL
-    ],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      if (
+        origin.includes("localhost") ||
+        origin.includes("netlify.app")
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS blocked"));
+    },
     credentials: true,
   })
 );
+
+app.options("*", cors());
 
 app.use(express.json());
 
