@@ -19,7 +19,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://69f433d415f8b0188ffcb906--engeryconsumption.netlify.app" // 👈 YOUR NETLIFY URL
+      "https://energyconsumption.netlify.app" // 👈 YOUR NETLIFY URL
     ],
     credentials: true,
   })
