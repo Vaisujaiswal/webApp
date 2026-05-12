@@ -5,7 +5,7 @@ A full-stack MERN application to track electricity usage, manage devices, analyz
 ---
 
 ## 🚀 Live Demo
-👉 https://your-netlify-link.netlify.app  
+👉 https://engeryconsumption.netlify.app  
 
 ---
 
